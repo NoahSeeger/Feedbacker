@@ -1,0 +1,94 @@
+{
+  "nav": {
+    "home": "Home",
+    "boards": "Boards",
+    "settings": "Einstellungen",
+    "logout": "Logout",
+    "login": "Login"
+  },
+  "landing": {
+    "title": "Sammle wertvolles",
+    "subtitle": "Feedback",
+    "description": "Mit Feedbacker kannst du einfach und anonym Feedback sammeln. Erstelle ein Board, teile den Link und lass die Community die besten Ideen finden.",
+    "getStarted": "Jetzt starten",
+    "dashboard": "Zum Dashboard",
+    "features": {
+      "headline": "Einfach. Anonym. Effektiv.",
+      "anonymous": {
+        "title": "Anonymes Feedback",
+        "description": "Keine Anmeldung erforderlich. Teilnehmer können direkt und anonym Feedback geben."
+      },
+      "sharing": {
+        "title": "Einfaches Teilen",
+        "description": "Teile dein Feedback-Board mit einem Link. Keine komplizierte Einrichtung nötig."
+      },
+      "voting": {
+        "title": "Community Voting",
+        "description": "Lass die Gemeinschaft die besten Ideen durch Up- und Down-Voting finden."
+      }
+    }
+  },
+  "dashboard": {
+    "title": "Feedback Boards",
+    "myBoards": "Meine Feedback Boards",
+    "allBoards": "Alle Feedback Boards",
+    "createBoard": "Neues Board erstellen",
+    "owner": "Eigentümer",
+    "newBoard": {
+      "title": "Neues Feedback Board erstellen",
+      "nameLabel": "Name des Boards",
+      "descriptionLabel": "Beschreibung des Boards",
+      "create": "Erstellen",
+      "cancel": "Abbrechen"
+    }
+  },
+  "feedbackBoard": {
+    "yourFeedback": "Dein Feedback",
+    "placeholder": "Was denkst du?",
+    "submit": "Feedback senden",
+    "waitMessage": "Bitte warten Sie noch {seconds} Sekunden",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "share": "Teilen",
+    "copied": "Link wurde kopiert",
+    "noFeedback": "Noch keine Feedback-Einträge vorhanden"
+  },
+  "settings": {
+    "title": "Account Einstellungen",
+    "changePassword": "Passwort ändern",
+    "newPassword": "Neues Passwort",
+    "save": "Speichern",
+    "deleteAccount": "Account löschen",
+    "deleteWarning": "Diese Aktion kann nicht rückgängig gemacht werden",
+    "confirmDelete": "Wirklich löschen?",
+    "success": {
+      "password": "Passwort wurde erfolgreich geändert",
+      "delete": "Account wurde gelöscht"
+    },
+    "error": {
+      "password": "Fehler beim Ändern des Passworts",
+      "delete": "Fehler beim Löschen des Accounts"
+    }
+  },
+  "auth": {
+    "email": "E-Mail",
+    "password": "Passwort",
+    "login": "Einloggen",
+    "register": "Registrieren",
+    "forgotPassword": "Passwort vergessen?",
+    "errors": {
+      "invalidEmail": "Ungültige E-Mail-Adresse",
+      "weakPassword": "Passwort zu schwach",
+      "loginFailed": "Login fehlgeschlagen"
+    }
+  },
+  "common": {
+    "loading": "Lädt...",
+    "error": "Ein Fehler ist aufgetreten",
+    "success": "Erfolgreich",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "edit": "Bearbeiten"
+  }
+}

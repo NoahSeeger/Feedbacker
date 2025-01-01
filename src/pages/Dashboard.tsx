@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "../config/supabaseClient";
 import { containsInappropriateContent } from "../utils/contentChecker";
 
@@ -12,6 +13,7 @@ interface FeedbackBoard {
 }
 
 export default function Dashboard({ user }: { user: any }) {
+  const { t } = useTranslation();
   const [boards, setBoards] = useState<FeedbackBoard[]>([]);
   const [newBoard, setNewBoard] = useState({ title: "", description: "" });
   const [isCreating, setIsCreating] = useState(false);
@@ -68,12 +70,12 @@ export default function Dashboard({ user }: { user: any }) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-bold">Feedback Boards</h1>
+        <h1 className="text-2xl font-bold">{t("dashboard.title")}</h1>
         <button
           onClick={() => setIsCreating(true)}
           className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
         >
-          Neues Board erstellen
+          {t("dashboard.createBoard")}
         </button>
       </div>
 
@@ -81,13 +83,13 @@ export default function Dashboard({ user }: { user: any }) {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
           <div className="bg-white p-4 sm:p-6 rounded-lg w-full max-w-md mx-4">
             <h2 className="text-xl font-bold mb-4">
-              Neues Feedback Board erstellen
+              {t("dashboard.newBoard.title")}
             </h2>
             <form onSubmit={createBoard}>
               {error && <div className="text-red-500 mb-4">{error}</div>}
               <input
                 type="text"
-                placeholder="Name des Boards"
+                placeholder={t("dashboard.newBoard.nameLabel")}
                 value={newBoard.title}
                 onChange={(e) =>
                   setNewBoard({ ...newBoard, title: e.target.value })
@@ -95,7 +97,7 @@ export default function Dashboard({ user }: { user: any }) {
                 className="w-full p-2 border rounded mb-4"
               />
               <textarea
-                placeholder="Beschreibung des Boards"
+                placeholder={t("dashboard.newBoard.descriptionLabel")}
                 value={newBoard.description}
                 onChange={(e) =>
                   setNewBoard({ ...newBoard, description: e.target.value })
@@ -108,13 +110,13 @@ export default function Dashboard({ user }: { user: any }) {
                   onClick={() => setIsCreating(false)}
                   className="px-4 py-2 text-gray-600 hover:text-gray-800"
                 >
-                  Abbrechen
+                  {t("common.cancel")}
                 </button>
                 <button
                   type="submit"
                   className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                 >
-                  Erstellen
+                  {t("dashboard.newBoard.create")}
                 </button>
               </div>
             </form>
@@ -122,9 +124,8 @@ export default function Dashboard({ user }: { user: any }) {
         </div>
       )}
 
-      {/* Eigene Boards Sektion */}
       <div className="mb-12">
-        <h2 className="text-2xl font-bold mb-6">Meine Feedback Boards</h2>
+        <h2 className="text-2xl font-bold mb-6">{t("dashboard.myBoards")}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {ownBoards.map((board) => (
             <Link
@@ -137,7 +138,7 @@ export default function Dashboard({ user }: { user: any }) {
                 <p className="text-gray-600">{board.description}</p>
                 <div className="mt-4">
                   <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
-                    Eigentümer
+                    {t("dashboard.owner")}
                   </span>
                 </div>
               </div>
@@ -146,9 +147,8 @@ export default function Dashboard({ user }: { user: any }) {
         </div>
       </div>
 
-      {/* Andere Boards Sektion */}
       <div>
-        <h2 className="text-2xl font-bold mb-6">Alle Feedback Boards</h2>
+        <h2 className="text-2xl font-bold mb-6">{t("dashboard.allBoards")}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {otherBoards.map((board) => (
             <Link

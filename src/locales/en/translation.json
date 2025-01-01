@@ -1,0 +1,94 @@
+{
+  "nav": {
+    "home": "Home",
+    "boards": "Boards",
+    "settings": "Settings",
+    "logout": "Logout",
+    "login": "Login"
+  },
+  "landing": {
+    "title": "Collect valuable",
+    "subtitle": "Feedback",
+    "description": "With Feedbacker you can easily collect anonymous feedback. Create a board, share the link and let the community find the best ideas.",
+    "getStarted": "Get Started",
+    "dashboard": "To Dashboard",
+    "features": {
+      "headline": "Simple. Anonymous. Effective.",
+      "anonymous": {
+        "title": "Anonymous Feedback",
+        "description": "No registration required. Participants can give feedback directly and anonymously."
+      },
+      "sharing": {
+        "title": "Easy Sharing",
+        "description": "Share your feedback board with a link. No complicated setup needed."
+      },
+      "voting": {
+        "title": "Community Voting",
+        "description": "Let the community find the best ideas through up and down voting."
+      }
+    }
+  },
+  "dashboard": {
+    "title": "Feedback Boards",
+    "myBoards": "My Feedback Boards",
+    "allBoards": "All Feedback Boards",
+    "createBoard": "Create New Board",
+    "owner": "Owner",
+    "newBoard": {
+      "title": "Create New Feedback Board",
+      "nameLabel": "Board Name",
+      "descriptionLabel": "Board Description",
+      "create": "Create",
+      "cancel": "Cancel"
+    }
+  },
+  "feedbackBoard": {
+    "yourFeedback": "Your Feedback",
+    "placeholder": "What do you think?",
+    "submit": "Submit Feedback",
+    "waitMessage": "Please wait {seconds} seconds",
+    "edit": "Edit",
+    "delete": "Delete",
+    "share": "Share",
+    "copied": "Link copied",
+    "noFeedback": "No feedback entries yet"
+  },
+  "settings": {
+    "title": "Account Settings",
+    "changePassword": "Change Password",
+    "newPassword": "New Password",
+    "save": "Save",
+    "deleteAccount": "Delete Account",
+    "deleteWarning": "This action cannot be undone",
+    "confirmDelete": "Really delete?",
+    "success": {
+      "password": "Password changed successfully",
+      "delete": "Account deleted"
+    },
+    "error": {
+      "password": "Error changing password",
+      "delete": "Error deleting account"
+    }
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "login": "Login",
+    "register": "Register",
+    "forgotPassword": "Forgot Password?",
+    "errors": {
+      "invalidEmail": "Invalid email address",
+      "weakPassword": "Password too weak",
+      "loginFailed": "Login failed"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit"
+  }
+}

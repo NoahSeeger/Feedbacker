@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "../config/supabaseClient";
 import { toast } from "react-hot-toast";
 
 export default function AccountSettings({ user }: { user: any }) {
+  const { t } = useTranslation();
   const [newPassword, setNewPassword] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -14,10 +16,10 @@ export default function AccountSettings({ user }: { user: any }) {
       });
 
       if (error) throw error;
-      toast.success("Passwort wurde erfolgreich geändert");
+      toast.success(t("settings.success.password"));
       setNewPassword("");
     } catch (err) {
-      toast.error("Fehler beim Ändern des Passworts");
+      toast.error(t("settings.error.password"));
     }
   };
 
@@ -42,49 +44,53 @@ export default function AccountSettings({ user }: { user: any }) {
       );
       if (authError) throw authError;
 
-      toast.success("Account wurde gelöscht");
+      toast.success(t("settings.success.delete"));
       // Redirect zur Landing Page
     } catch (err) {
-      toast.error("Fehler beim Löschen des Accounts");
+      toast.error(t("settings.error.delete"));
       setIsDeleting(false);
     }
   };
 
   return (
     <div className="max-w-2xl mx-auto p-4 sm:p-6 lg:p-8">
-      <h1 className="text-2xl font-bold mb-6">Account Einstellungen</h1>
+      <h1 className="text-2xl font-bold mb-6">{t("settings.title")}</h1>
 
       {/* Passwort ändern */}
       <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
-        <h2 className="text-xl font-semibold mb-4">Passwort ändern</h2>
+        <h2 className="text-xl font-semibold mb-4">
+          {t("settings.changePassword")}
+        </h2>
         <form onSubmit={handlePasswordChange} className="space-y-4">
           <input
             type="password"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
-            placeholder="Neues Passwort"
+            placeholder={t("settings.newPassword")}
             className="w-full p-2 border rounded"
           />
           <button
             type="submit"
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
-            Passwort ändern
+            {t("settings.save")}
           </button>
         </form>
       </div>
 
       {/* Account löschen */}
       <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-        <h2 className="text-xl font-semibold mb-4">Account löschen</h2>
-        <p className="text-gray-600 mb-4">
-          Diese Aktion kann nicht rückgängig gemacht werden.
-        </p>
+        <h2 className="text-xl font-semibold mb-4">
+          {t("settings.deleteAccount")}
+        </h2>
+        <p className="text-gray-600 mb-4">{t("settings.deleteWarning")}</p>
         <button
           onClick={handleDeleteAccount}
           className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
         >
-          {isDeleting ? "Wirklich löschen?" : "Account löschen"}
+          {isDeleting
+            ? t("settings.confirmDelete")
+            : t("settings.deleteAccount")}
         </button>
       </div>
     </div>

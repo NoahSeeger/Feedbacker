@@ -1,21 +1,22 @@
+import { useTranslation } from "react-i18next";
+
 export default function Features() {
+  const { t } = useTranslation();
+
   const features = [
     {
-      title: "Anonymes Feedback",
-      description:
-        "Keine Anmeldung erforderlich. Teilnehmer können direkt und anonym Feedback geben.",
+      title: t("landing.features.anonymous.title"),
+      description: t("landing.features.anonymous.description"),
       icon: "🎭",
     },
     {
-      title: "Einfaches Teilen",
-      description:
-        "Teile dein Feedback-Board mit einem Link. Keine komplizierte Einrichtung nötig.",
+      title: t("landing.features.sharing.title"),
+      description: t("landing.features.sharing.description"),
       icon: "🔗",
     },
     {
-      title: "Community Voting",
-      description:
-        "Lass die Gemeinschaft die besten Ideen durch Up- und Down-Voting finden.",
+      title: t("landing.features.voting.title"),
+      description: t("landing.features.voting.description"),
       icon: "👍",
     },
   ];
@@ -23,7 +24,7 @@ export default function Features() {
   return (
     <div>
       <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
-        Einfach. Anonym. Effektiv.
+        {t("landing.features.headline")}
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {features.map((feature) => (

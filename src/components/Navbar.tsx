@@ -1,13 +1,20 @@
 import { Link } from "react-router-dom";
 import { supabase } from "../config/supabaseClient";
+import { useTranslation } from "react-i18next";
 
 interface NavbarProps {
   user: any;
 }
 
 export default function Navbar({ user }: NavbarProps) {
+  const { t, i18n } = useTranslation();
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
+  };
+
+  const toggleLanguage = () => {
+    i18n.changeLanguage(i18n.language === "de" ? "en" : "de");
   };
 
   return (
@@ -31,19 +38,19 @@ export default function Navbar({ user }: NavbarProps) {
                     to="/dashboard"
                     className="text-gray-600 hover:text-blue-600"
                   >
-                    Dashboard
+                    {t("nav.boards")}
                   </Link>
                   <Link
                     to="/settings"
                     className="text-gray-600 hover:text-blue-600"
                   >
-                    Einstellungen
+                    {t("nav.settings")}
                   </Link>
                   <button
                     onClick={handleLogout}
                     className="text-red-500 hover:text-red-700"
                   >
-                    Logout
+                    {t("nav.logout")}
                   </button>
                 </>
               ) : (
@@ -51,9 +58,16 @@ export default function Navbar({ user }: NavbarProps) {
                   to="/"
                   className="text-blue-600 hover:text-blue-800 font-medium"
                 >
-                  Login
+                  {t("nav.login")}
                 </Link>
               )}
+              {/* Sprach-Toggle Button */}
+              <button
+                onClick={toggleLanguage}
+                className="px-3 py-1 text-sm bg-gray-100 rounded-md hover:bg-gray-200"
+              >
+                {i18n.language === "de" ? "🇬🇧 EN" : "🇩🇪 DE"}
+              </button>
             </div>
           </div>
         </div>
@@ -67,7 +81,7 @@ export default function Navbar({ user }: NavbarProps) {
             className="flex flex-col items-center justify-center w-full h-full text-gray-600 hover:text-blue-600 active:bg-gray-100"
           >
             <span className="text-2xl mb-1">💬</span>
-            <span className="text-xs">Home</span>
+            <span className="text-xs">{t("nav.home")}</span>
           </Link>
           {user ? (
             <>
@@ -76,21 +90,21 @@ export default function Navbar({ user }: NavbarProps) {
                 className="flex flex-col items-center justify-center w-full h-full text-gray-600 hover:text-blue-600 active:bg-gray-100"
               >
                 <span className="text-2xl mb-1">📋</span>
-                <span className="text-xs">Boards</span>
+                <span className="text-xs">{t("nav.boards")}</span>
               </Link>
               <Link
                 to="/settings"
                 className="flex flex-col items-center justify-center w-full h-full text-gray-600 hover:text-blue-600 active:bg-gray-100"
               >
                 <span className="text-2xl mb-1">⚙️</span>
-                <span className="text-xs">Settings</span>
+                <span className="text-xs">{t("nav.settings")}</span>
               </Link>
               <button
                 onClick={handleLogout}
                 className="flex flex-col items-center justify-center w-full h-full text-gray-600 hover:text-red-600 active:bg-gray-100"
               >
                 <span className="text-2xl mb-1">🚪</span>
-                <span className="text-xs">Logout</span>
+                <span className="text-xs">{t("nav.logout")}</span>
               </button>
             </>
           ) : (
@@ -99,9 +113,17 @@ export default function Navbar({ user }: NavbarProps) {
               className="flex flex-col items-center justify-center w-full h-full text-gray-600 hover:text-blue-600 active:bg-gray-100"
             >
               <span className="text-2xl mb-1">🔑</span>
-              <span className="text-xs">Login</span>
+              <span className="text-xs">{t("nav.login")}</span>
             </Link>
           )}
+          {/* Mobile Sprach-Toggle */}
+          <button
+            onClick={toggleLanguage}
+            className="flex flex-col items-center justify-center w-full h-full text-gray-600 active:bg-gray-100"
+          >
+            <span className="text-2xl mb-1">🌐</span>
+            <span className="text-xs">{i18n.language.toUpperCase()}</span>
+          </button>
         </div>
       </nav>
 

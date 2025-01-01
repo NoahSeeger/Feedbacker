@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { toast } from "react-hot-toast";
 import { supabase } from "../config/supabaseClient";
 import DeleteBoardModal from "../components/DeleteBoardModal";
@@ -22,6 +23,7 @@ interface BoardDetails {
 }
 
 export default function FeedbackBoard({ user }: { user: any }) {
+  const { t } = useTranslation();
   const { boardId } = useParams();
   const navigate = useNavigate();
 
@@ -261,7 +263,7 @@ export default function FeedbackBoard({ user }: { user: any }) {
     return (
       <div className="text-center py-12">
         <h2 className="text-2xl font-bold text-gray-900">
-          Board nicht gefunden
+          {t("feedbackBoard.notFound")}
         </h2>
       </div>
     );
@@ -270,7 +272,6 @@ export default function FeedbackBoard({ user }: { user: any }) {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto p-3 sm:p-6 lg:p-8">
-        {/* Header Section */}
         <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-4 sm:mb-8">
           {isEditing ? (
             <div className="space-y-4">
@@ -279,13 +280,13 @@ export default function FeedbackBoard({ user }: { user: any }) {
                 value={editTitle}
                 onChange={(e) => setEditTitle(e.target.value)}
                 className="w-full px-4 py-2 text-lg font-semibold border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Board Titel"
+                placeholder={t("feedbackBoard.titlePlaceholder")}
               />
               <textarea
                 value={editDescription}
                 onChange={(e) => setEditDescription(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Board Beschreibung"
+                placeholder={t("feedbackBoard.descriptionPlaceholder")}
                 rows={3}
               />
               <div className="flex gap-2">
@@ -293,13 +294,13 @@ export default function FeedbackBoard({ user }: { user: any }) {
                   onClick={handleUpdateBoard}
                   className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                 >
-                  Speichern
+                  {t("common.save")}
                 </button>
                 <button
                   onClick={() => setIsEditing(false)}
                   className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
                 >
-                  Abbrechen
+                  {t("common.cancel")}
                 </button>
               </div>
             </div>
@@ -317,14 +318,14 @@ export default function FeedbackBoard({ user }: { user: any }) {
                       className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                     >
                       <span className="mr-2">✏️</span>
-                      Bearbeiten
+                      {t("common.edit")}
                     </button>
                     <button
                       onClick={() => setShowDeleteModal(true)}
                       className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
                     >
                       <span className="mr-2">🗑️</span>
-                      Löschen
+                      {t("common.delete")}
                     </button>
                   </>
                 )}
@@ -333,14 +334,13 @@ export default function FeedbackBoard({ user }: { user: any }) {
                   className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
                 >
                   <span className="mr-2">📤</span>
-                  Teilen
+                  {t("feedbackBoard.share")}
                 </button>
               </div>
             </div>
           )}
         </div>
 
-        {/* Feedback Input Section */}
         <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-4 sm:mb-8">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -348,7 +348,7 @@ export default function FeedbackBoard({ user }: { user: any }) {
                 htmlFor="feedback"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Dein Feedback
+                {t("feedbackBoard.yourFeedback")}
               </label>
               <textarea
                 id="feedback"
@@ -356,7 +356,7 @@ export default function FeedbackBoard({ user }: { user: any }) {
                 onChange={(e) => setNewFeedback(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 rows={3}
-                placeholder="Was denkst du?"
+                placeholder={t("feedbackBoard.placeholder")}
               />
             </div>
             <div className="flex justify-end">
@@ -369,24 +369,19 @@ export default function FeedbackBoard({ user }: { user: any }) {
                     : "bg-gray-400 cursor-not-allowed"
                 }`}
               >
-                Feedback senden
+                {t("feedbackBoard.submit")}
               </button>
             </div>
             {!canSubmitFeedback() && (
               <p className="text-sm text-gray-500 text-right">
-                Bitte warten Sie noch {timeRemaining} Sekunden
+                {t("feedbackBoard.waitMessage", { seconds: timeRemaining })}
               </p>
             )}
           </form>
         </div>
 
-        {/* Feedback List Section */}
         <div className="space-y-4">
-          {isLoading ? (
-            <div className="text-center py-8">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
-            </div>
-          ) : feedbackItems.length > 0 ? (
+          {feedbackItems.length > 0 ? (
             feedbackItems.map((item) => (
               <FeedbackItem
                 key={item.id}
@@ -403,9 +398,7 @@ export default function FeedbackBoard({ user }: { user: any }) {
             ))
           ) : (
             <div className="text-center py-8">
-              <p className="text-gray-500">
-                Noch keine Feedback-Einträge vorhanden.
-              </p>
+              <p className="text-gray-500">{t("feedbackBoard.noFeedback")}</p>
             </div>
           )}
         </div>
