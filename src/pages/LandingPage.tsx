@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Features from "../components/Features";
 
-export default function LandingPage({ user }: { user: any }) {
+export default function LandingPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
