@@ -124,7 +124,9 @@ export default function Navbar({ user }: NavbarProps) {
             className="flex flex-col items-center justify-center w-full h-full text-gray-600 active:bg-gray-100"
           >
             <span className="text-2xl mb-1">🌐</span>
-            <span className="text-xs">{i18n.language.toUpperCase()}</span>
+            <span className="text-xs">
+              {(i18n.language || "en").toUpperCase()}
+            </span>
           </button>
         </div>
       </nav>
