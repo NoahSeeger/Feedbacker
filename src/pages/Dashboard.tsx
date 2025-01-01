@@ -84,6 +84,7 @@ export default function Dashboard({ user }: { user: any }) {
               Neues Feedback Board erstellen
             </h2>
             <form onSubmit={createBoard}>
+              {error && <div className="text-red-500 mb-4">{error}</div>}
               <input
                 type="text"
                 placeholder="Name des Boards"

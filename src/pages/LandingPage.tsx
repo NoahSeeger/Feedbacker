@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import Hero from "../components/Hero";
+import { useNavigate } from "react-router-dom";
+// import Hero from "../components/Hero";
 import Features from "../components/Features";
 import AuthModal from "../components/AuthModal";
 import { supabase } from "../config/supabaseClient";

@@ -11,6 +11,7 @@ interface FeedbackItem {
   content: string;
   board_id: string;
   created_at: string;
+  user_id?: string;
 }
 
 interface BoardDetails {
