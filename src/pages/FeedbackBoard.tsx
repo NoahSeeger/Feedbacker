@@ -6,6 +6,10 @@ import { supabase } from "../config/supabaseClient";
 import DeleteBoardModal from "../components/DeleteBoardModal";
 import FeedbackItem from "../components/FeedbackItem";
 import { v4 as uuidv4 } from "uuid";
+import { containsInappropriateContent } from "../utils/contentChecker";
+import { SessionService } from "../services/sessionService";
+import { FeedbackService } from "../services/feedbackService";
+import { deleteFeedback } from "../services/feedbackService";
 
 interface FeedbackItem {
   id: string;
@@ -39,15 +43,15 @@ export default function FeedbackBoard({ user }: { user: any }) {
   const [editDescription, setEditDescription] = useState("");
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
 
-  const FEEDBACK_COOLDOWN = 30000;
+  const FEEDBACK_COOLDOWN = 30;
 
   const [sessionId] = useState(() => {
-    const existing = localStorage.getItem("feedback_session_id");
-    if (existing) return existing;
-
-    const newId = uuidv4();
-    localStorage.setItem("feedback_session_id", newId);
-    return newId;
+    let existingId = localStorage.getItem("feedback_session_id");
+    if (!existingId) {
+      existingId = crypto.randomUUID();
+      localStorage.setItem("feedback_session_id", existingId);
+    }
+    return existingId;
   });
 
   useEffect(() => {
@@ -96,18 +100,11 @@ export default function FeedbackBoard({ user }: { user: any }) {
   }, [boardId, user?.id, navigate]);
 
   useEffect(() => {
-    const initialRemaining = Math.max(
-      0,
-      FEEDBACK_COOLDOWN - (Date.now() - lastFeedbackTime)
-    );
-    setTimeRemaining(Math.ceil(initialRemaining / 1000));
-
     const timer = setInterval(() => {
-      const remaining = Math.max(
-        0,
-        FEEDBACK_COOLDOWN - (Date.now() - lastFeedbackTime)
-      );
-      setTimeRemaining(Math.ceil(remaining / 1000));
+      const now = Date.now();
+      const timeSinceLastFeedback = Math.floor((now - lastFeedbackTime) / 1000);
+      const remaining = Math.max(0, FEEDBACK_COOLDOWN - timeSinceLastFeedback);
+      setTimeRemaining(remaining);
     }, 1000);
 
     return () => clearInterval(timer);
@@ -115,11 +112,7 @@ export default function FeedbackBoard({ user }: { user: any }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!canSubmitFeedback()) {
-      toast.error(`Bitte warten Sie noch ${timeRemaining} Sekunden`);
-      return;
-    }
+    if (!canSubmitFeedback()) return;
 
     const cleanContent = newFeedback.trim();
     if (!cleanContent) {
@@ -127,14 +120,18 @@ export default function FeedbackBoard({ user }: { user: any }) {
       return;
     }
 
+    if (containsInappropriateContent(cleanContent)) {
+      toast.error("Bitte verwenden Sie eine angemessene Sprache");
+      return;
+    }
+
     try {
-      const { data, error: insertError } = await supabase
+      const { data, error } = await supabase
         .from("feedback_items")
         .insert([
           {
-            content: cleanContent,
+            content: newFeedback,
             board_id: boardId,
-            created_at: new Date().toISOString(),
             user_id: user?.id || null,
             session_id: user?.id ? null : sessionId,
           },
@@ -142,14 +139,13 @@ export default function FeedbackBoard({ user }: { user: any }) {
         .select()
         .single();
 
-      if (insertError) throw insertError;
+      if (error) throw error;
 
       setFeedbackItems([data, ...feedbackItems]);
       setNewFeedback("");
-      setLastFeedbackTime(Date.now());
       toast.success("Feedback wurde hinzugefügt");
-    } catch (err) {
-      console.error("Error adding feedback:", err);
+    } catch (error) {
+      console.error("Error adding feedback:", error);
       toast.error("Fehler beim Hinzufügen des Feedbacks");
     }
   };
@@ -199,7 +195,9 @@ export default function FeedbackBoard({ user }: { user: any }) {
   };
 
   const canSubmitFeedback = () => {
-    return timeRemaining === 0;
+    const now = Date.now();
+    const timeSinceLastFeedback = Math.floor((now - lastFeedbackTime) / 1000);
+    return timeSinceLastFeedback >= FEEDBACK_COOLDOWN;
   };
 
   const handleShare = async () => {
@@ -248,6 +246,45 @@ export default function FeedbackBoard({ user }: { user: any }) {
       setEditTitle(boardDetails.title);
       setEditDescription(boardDetails.description);
       setIsEditing(true);
+    }
+  };
+
+  const handleDelete = async (feedbackId: string) => {
+    try {
+      if (!feedbackId) return;
+
+      const sessionId = localStorage.getItem("feedback_session_id") || "";
+
+      // Optimistisches UI-Update
+      setFeedbackItems((prevItems) =>
+        prevItems.filter((item) => item.id !== feedbackId)
+      );
+
+      await deleteFeedback({
+        feedbackId,
+        userId: user?.id,
+        sessionId,
+      });
+
+      toast.success("Feedback wurde gelöscht");
+    } catch (error) {
+      // Bei Fehler den gelöschten Eintrag wiederherstellen
+      const { data } = await supabase
+        .from("feedback_items")
+        .select("*")
+        .eq("id", feedbackId)
+        .single();
+
+      if (data) {
+        setFeedbackItems((prevItems) => [...prevItems, data]);
+      }
+
+      console.error("Delete error:", error);
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Fehler beim Löschen des Feedbacks");
+      }
     }
   };
 
@@ -374,7 +411,8 @@ export default function FeedbackBoard({ user }: { user: any }) {
             </div>
             {!canSubmitFeedback() && (
               <p className="text-sm text-gray-500 text-right">
-                {t("feedbackBoard.waitMessage", { seconds: timeRemaining })}
+                {t("feedbackBoard.waitMessagePrefix")} {timeRemaining}{" "}
+                {t("feedbackBoard.waitMessageSuffix")}
               </p>
             )}
           </form>
@@ -389,11 +427,7 @@ export default function FeedbackBoard({ user }: { user: any }) {
                 userId={user?.id}
                 sessionId={sessionId}
                 isOwner={isOwner || (user?.id && item.user_id === user.id)}
-                onDelete={() => {
-                  setFeedbackItems((items) =>
-                    items.filter((i) => i.id !== item.id)
-                  );
-                }}
+                onDelete={() => handleDelete(item.id)}
               />
             ))
           ) : (

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "./config/supabaseClient";
+import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
@@ -28,6 +29,7 @@ function App() {
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-gray-50">
+        <Toaster position="top-right" />
         <Navbar user={user} />
         <Routes>
           <Route path="/" element={<LandingPage />} />

@@ -54,7 +54,9 @@
     "delete": "Löschen",
     "share": "Teilen",
     "copied": "Link wurde kopiert",
-    "noFeedback": "Noch keine Feedback-Einträge vorhanden"
+    "noFeedback": "Noch keine Feedback-Einträge vorhanden",
+    "waitMessagePrefix": "Bitte warten Sie noch",
+    "waitMessageSuffix": "Sekunden"
   },
   "settings": {
     "title": "Account Einstellungen",
@@ -93,5 +95,11 @@
     "save": "Speichern",
     "delete": "Löschen",
     "edit": "Bearbeiten"
+  },
+  "notFound": {
+    "title": "Seite nicht gefunden",
+    "description": "Entschuldigung, wir konnten die gesuchte Seite nicht finden.",
+    "goHome": "Zur Startseite",
+    "goBack": "Zurück"
   }
 }

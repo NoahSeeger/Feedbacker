@@ -54,7 +54,9 @@
     "delete": "Delete",
     "share": "Share",
     "copied": "Link copied",
-    "noFeedback": "No feedback entries yet"
+    "noFeedback": "No feedback entries yet",
+    "waitMessagePrefix": "Please wait",
+    "waitMessageSuffix": "seconds"
   },
   "settings": {
     "title": "Account Settings",
@@ -93,5 +95,11 @@
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "Sorry, we couldn't find the page you're looking for.",
+    "goHome": "Go home",
+    "goBack": "Go back"
   }
 }

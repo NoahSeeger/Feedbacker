@@ -1,7 +1,6 @@
-import { supabase } from "../config/supabaseClient";
-import { containsInappropriateContent } from "../utils/contentChecker";
-import { toast } from "react-hot-toast";
+import { useState } from "react";
 import VoteButtons from "./VoteButtons";
+import { containsInappropriateContent } from "../utils/contentChecker";
 
 interface FeedbackItemProps {
   feedback: {
@@ -9,49 +8,52 @@ interface FeedbackItemProps {
     content: string;
     created_at: string;
     user_id?: string;
+    session_id?: string;
   };
   userId?: string;
   sessionId: string;
-  isOwner: boolean;
-  onDelete?: () => void;
+  onDelete: (feedbackId: string) => void;
 }
 
 export default function FeedbackItem({
   feedback,
   userId,
   sessionId,
-  isOwner,
   onDelete,
 }: FeedbackItemProps) {
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const handleDelete = async () => {
+    if (isDeleting) return;
+    setIsDeleting(true);
     try {
-      const { error } = await supabase
-        .from("feedback_items")
-        .delete()
-        .eq("id", feedback.id);
-
-      if (error) throw error;
-
-      onDelete?.();
-      toast.success("Feedback wurde gelöscht");
-    } catch (err) {
-      console.error("Error deleting feedback:", err);
-      toast.error("Fehler beim Löschen des Feedbacks");
+      await onDelete(feedback.id);
+    } finally {
+      setIsDeleting(false);
     }
   };
+
+  const canDelete =
+    (userId && feedback.user_id === userId) || // Eingeloggter User
+    (!userId && feedback.session_id === sessionId); // Nicht eingeloggter User mit session_id
 
   const hasInappropriateContent = containsInappropriateContent(
     feedback.content
   );
   const displayContent = hasInappropriateContent
     ? feedback.content.replace(/[^\s]/g, "*")
+    : feedback.content.length > 280
+    ? `${feedback.content.slice(0, 280)}...`
     : feedback.content;
 
   return (
-    <div className="bg-white rounded-lg shadow p-3 sm:p-4">
+    <div className="bg-white rounded-lg shadow p-4">
       <div className="flex flex-col sm:flex-row justify-between gap-2 sm:gap-4">
         <div className="flex-1">
           <p className="text-sm sm:text-base">{displayContent}</p>
+          <span className="text-sm text-gray-500 mt-2 block">
+            {new Date(feedback.created_at).toLocaleString()}
+          </span>
         </div>
         <div className="flex flex-row sm:flex-col items-center gap-2">
           <VoteButtons
@@ -59,10 +61,11 @@ export default function FeedbackItem({
             userId={userId}
             sessionId={sessionId}
           />
-          {isOwner && (
+          {canDelete && (
             <button
               onClick={handleDelete}
-              className="ml-4 text-red-600 hover:text-red-800"
+              disabled={isDeleting}
+              className="ml-4 text-red-600 hover:text-red-800 disabled:opacity-50"
               title="Feedback löschen"
             >
               🗑️
