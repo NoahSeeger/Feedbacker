@@ -1,6 +1,7 @@
 import { useState } from "react";
 import VoteButtons from "./VoteButtons";
 import { containsInappropriateContent } from "../utils/contentChecker";
+// import { useTranslation } from "react-i18next";
 
 interface FeedbackItemProps {
   feedback: {
@@ -12,7 +13,7 @@ interface FeedbackItemProps {
   };
   userId?: string;
   sessionId: string;
-  isOwner: boolean;
+  isBoardOwner: boolean;
   onDelete: (feedbackId: string) => void;
 }
 
@@ -20,13 +21,19 @@ export default function FeedbackItem({
   feedback,
   userId,
   sessionId,
-  // isOwner,
+  isBoardOwner,
   onDelete,
 }: FeedbackItemProps) {
+  // const { t } = useTranslation();
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const canDelete =
+    isBoardOwner ||
+    (userId && feedback.user_id === userId) ||
+    (!userId && feedback.session_id === sessionId);
+
   const handleDelete = async () => {
-    if (isDeleting) return;
+    if (isDeleting || !canDelete) return;
     setIsDeleting(true);
     try {
       await onDelete(feedback.id);
@@ -34,10 +41,6 @@ export default function FeedbackItem({
       setIsDeleting(false);
     }
   };
-
-  const canDelete =
-    (userId && feedback.user_id === userId) || // Eingeloggter User
-    (!userId && feedback.session_id === sessionId); // Nicht eingeloggter User mit session_id
 
   const hasInappropriateContent = containsInappropriateContent(
     feedback.content

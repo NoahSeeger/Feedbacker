@@ -56,7 +56,14 @@
     "copied": "Link wurde kopiert",
     "noFeedback": "Noch keine Feedback-Einträge vorhanden",
     "waitMessagePrefix": "Bitte warten Sie noch",
-    "waitMessageSuffix": "Sekunden"
+    "waitMessageSuffix": "Sekunden",
+    "sort": {
+      "label": "Sortieren nach",
+      "newest": "Neueste zuerst",
+      "oldest": "Älteste zuerst",
+      "mostVoted": "Meiste Stimmen",
+      "leastVoted": "Wenigste Stimmen"
+    }
   },
   "settings": {
     "title": "Account Einstellungen",
@@ -101,5 +108,74 @@
     "description": "Entschuldigung, wir konnten die gesuchte Seite nicht finden.",
     "goHome": "Zur Startseite",
     "goBack": "Zurück"
+  },
+  "account": {
+    "passwordMismatch": "Passwörter stimmen nicht überein",
+    "passwordChanged": "Passwort erfolgreich geändert",
+    "passwordError": "Fehler beim Ändern des Passworts",
+    "deleteConfirm": "Bist du sicher, dass du deinen Account löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "deleteSuccess": "Account wurde erfolgreich gelöscht",
+    "deleteError": "Fehler beim Löschen des Accounts"
+  },
+  "toast": {
+    "account": {
+      "passwordMismatch": "Passwörter stimmen nicht überein",
+      "passwordChanged": "Passwort erfolgreich geändert",
+      "passwordError": "Fehler beim Ändern des Passworts",
+      "deleteSuccess": "Account wurde erfolgreich gelöscht",
+      "deleteError": "Fehler beim Löschen des Accounts"
+    },
+    "feedback": {
+      "created": "Feedback erfolgreich gesendet",
+      "createError": "Fehler beim Senden des Feedbacks",
+      "deleted": "Feedback erfolgreich gelöscht",
+      "deleteError": "Fehler beim Löschen des Feedbacks",
+      "updated": "Feedback erfolgreich aktualisiert",
+      "updateError": "Fehler beim Aktualisieren des Feedbacks"
+    },
+    "voting": {
+      "added": "Stimme gezählt",
+      "removed": "Stimme entfernt",
+      "error": "Fehler beim Abstimmen",
+      "loginRequired": "Bitte melde dich an oder nutze die Session-ID zum Abstimmen",
+      "feedbackNotFound": "Feedback-Eintrag existiert nicht mehr"
+    },
+    "board": {
+      "created": "Board erfolgreich erstellt",
+      "createError": "Fehler beim Erstellen des Boards",
+      "deleted": "Board erfolgreich gelöscht",
+      "deleteError": "Fehler beim Löschen des Boards",
+      "updated": "Board erfolgreich aktualisiert",
+      "updateError": "Fehler beim Aktualisieren des Boards",
+      "linkCopied": "Link in Zwischenablage kopiert",
+      "copyError": "Fehler beim Kopieren des Links"
+    }
+  },
+  "accountSettings": {
+    "title": "Account Einstellungen",
+    "information": {
+      "title": "Account Informationen",
+      "email": "E-Mail",
+      "createdAt": "Account erstellt am",
+      "lastLogin": "Letzte Anmeldung"
+    },
+    "password": {
+      "title": "Passwort ändern",
+      "changeButton": "Passwort ändern",
+      "newPassword": "Neues Passwort",
+      "confirmPassword": "Passwort bestätigen",
+      "save": "Speichern",
+      "cancel": "Abbrechen"
+    },
+    "deleteAccount": {
+      "title": "Account löschen",
+      "button": "Account löschen"
+    }
+  },
+  "feedback": {
+    "emptyError": "Bitte geben Sie Feedback ein",
+    "inappropriateContent": "Bitte verwenden Sie eine angemessene Sprache",
+    "notFound": "Feedback-Eintrag nicht gefunden",
+    "deleteNotAllowed": "Sie haben keine Berechtigung, diesen Eintrag zu löschen"
   }
 }

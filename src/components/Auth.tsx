@@ -1,8 +1,16 @@
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "../config/supabaseClient";
+import { toast } from "react-hot-toast";
 
 export default function AuthComponent() {
+  supabase.auth.onAuthStateChange(async (event, session) => {
+    if (event === "SIGNED_IN" && session?.user?.user_metadata?.deleted) {
+      await supabase.auth.signOut();
+      toast.error("Dieser Account wurde gelöscht");
+    }
+  });
+
   return (
     <div className="bg-white rounded-xl shadow-sm p-6 sm:p-8">
       {/*       <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
@@ -46,7 +54,7 @@ export default function AuthComponent() {
             },
           },
         }}
-        providers={["google", "github"]}
+        providers={[]}
         localization={{
           variables: {
             sign_in: {

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../config/supabaseClient";
 import { toast } from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 interface VoteButtonsProps {
   feedbackId: string;
@@ -15,97 +16,91 @@ export default function VoteButtons({
 }: VoteButtonsProps) {
   const [voteCount, setVoteCount] = useState(0);
   const [isVoting, setIsVoting] = useState(false);
-  const [userVote, setUserVote] = useState<boolean | null>(null);
+  const [currentVote, setCurrentVote] = useState<"up" | "down" | null>(null);
+  const { t } = useTranslation();
 
+  // Lade den aktuellen Vote-Status
   useEffect(() => {
-    loadVotes();
+    loadVoteStatus();
   }, [feedbackId, userId, sessionId]);
 
-  const loadVotes = async () => {
+  const loadVoteStatus = async () => {
     try {
-      // Vereinfachte Abfrage
-      const { data: votes, error } = await supabase
+      // Lade den aktuellen Vote des Users
+      const { data: vote } = await supabase
         .from("feedback_votes")
-        .select("*")
+        .select("vote_type")
         .eq("feedback_id", feedbackId)
-        .or(userId ? `user_id.eq.${userId}` : `session_id.eq.${sessionId}`);
+        .eq(userId ? "user_id" : "session_id", userId || sessionId)
+        .maybeSingle();
 
-      console.log("Votes query result:", { votes, error }); // Debug-Log
+      setCurrentVote(vote?.vote_type || null);
 
-      if (!error && votes && votes.length > 0) {
-        setUserVote(votes[0].is_upvote);
+      // Lade die Vote-Summe
+      const { data: votes } = await supabase
+        .from("feedback_votes")
+        .select("vote_type")
+        .eq("feedback_id", feedbackId);
+
+      if (votes) {
+        const upvotes = votes.filter((v) => v.vote_type === "up").length;
+        const downvotes = votes.filter((v) => v.vote_type === "down").length;
+        setVoteCount(upvotes - downvotes);
       }
-
-      // Lade die Gesamtzahl der Votes
-      const [upvoteResponse, downvoteResponse] = await Promise.all([
-        supabase
-          .from("feedback_votes")
-          .select("id", { count: "exact", head: true })
-          .eq("feedback_id", feedbackId)
-          .eq("is_upvote", true),
-        supabase
-          .from("feedback_votes")
-          .select("id", { count: "exact", head: true })
-          .eq("feedback_id", feedbackId)
-          .eq("is_upvote", false),
-      ]);
-
-      const upvotes = upvoteResponse.count || 0;
-      const downvotes = downvoteResponse.count || 0;
-      setVoteCount(upvotes - downvotes);
-    } catch (err) {
-      console.error("Error loading votes:", err);
+    } catch (error) {
+      console.error("Error loading votes:", error);
     }
   };
 
-  const handleVote = async (isUpvote: boolean) => {
+  const handleVote = async (type: "up" | "down") => {
     if (isVoting) return;
     setIsVoting(true);
 
     try {
-      if (userVote !== null) {
-        // Lösche existierenden Vote
-        const { error: deleteError } = await supabase
+      if (!userId && !sessionId) {
+        toast.error(t("toast.voting.loginRequired"));
+        return;
+      }
+
+      if (currentVote === type) {
+        // Entferne Vote
+        await supabase
           .from("feedback_votes")
           .delete()
           .eq("feedback_id", feedbackId)
-          .or(userId ? `user_id.eq.${userId}` : `session_id.eq.${sessionId}`);
+          .eq(userId ? "user_id" : "session_id", userId || sessionId);
 
-        if (deleteError) {
-          console.error("Delete error:", deleteError); // Debug-Log
-          throw deleteError;
-        }
-
-        setVoteCount((prev) => (userVote ? prev - 1 : prev + 1));
-        setUserVote(null);
+        setCurrentVote(null);
+        toast.success(t("toast.voting.removed"));
       } else {
-        // Erstelle neuen Vote
+        // Erstelle oder aktualisiere Vote
         const voteData = {
           feedback_id: feedbackId,
-          is_upvote: isUpvote,
           user_id: userId || null,
           session_id: userId ? null : sessionId,
+          vote_type: type,
         };
 
-        console.log("Inserting vote:", voteData); // Debug-Log
-
-        const { error: insertError } = await supabase
-          .from("feedback_votes")
-          .insert([voteData]);
-
-        if (insertError) {
-          console.error("Insert error:", insertError); // Debug-Log
-          throw insertError;
+        if (currentVote) {
+          // Update existierenden Vote
+          await supabase
+            .from("feedback_votes")
+            .update({ vote_type: type })
+            .eq("feedback_id", feedbackId)
+            .eq(userId ? "user_id" : "session_id", userId || sessionId);
+        } else {
+          // Erstelle neuen Vote
+          await supabase.from("feedback_votes").insert([voteData]);
         }
 
-        setVoteCount((prev) => (isUpvote ? prev + 1 : prev - 1));
-        setUserVote(isUpvote);
+        setCurrentVote(type);
+        toast.success(t("toast.voting.added"));
       }
 
-      toast.success(userVote !== null ? "Vote entfernt" : "Vote wurde gezählt");
-    } catch (err) {
-      console.error("Error voting:", err);
-      toast.error("Fehler beim Abstimmen");
+      await loadVoteStatus();
+    } catch (error) {
+      console.error("Vote error:", error);
+      toast.error(t("toast.voting.error"));
     } finally {
       setIsVoting(false);
     }
@@ -114,14 +109,13 @@ export default function VoteButtons({
   return (
     <div className="flex items-center space-x-4">
       <button
-        onClick={() => handleVote(true)}
+        onClick={() => handleVote("up")}
         disabled={isVoting}
         className={`flex items-center space-x-1 px-2 py-1 rounded transition-colors ${
-          userVote === true
+          currentVote === "up"
             ? "bg-blue-100 text-blue-600 hover:bg-blue-200"
             : "hover:bg-gray-100"
         }`}
-        title={userVote === true ? "Klicken zum Entfernen" : "Upvote"}
       >
         <span className="text-xl">👍</span>
       </button>
@@ -137,14 +131,13 @@ export default function VoteButtons({
         {voteCount}
       </span>
       <button
-        onClick={() => handleVote(false)}
+        onClick={() => handleVote("down")}
         disabled={isVoting}
         className={`flex items-center space-x-1 px-2 py-1 rounded transition-colors ${
-          userVote === false
+          currentVote === "down"
             ? "bg-red-100 text-red-600 hover:bg-red-200"
             : "hover:bg-gray-100"
         }`}
-        title={userVote === false ? "Klicken zum Entfernen" : "Downvote"}
       >
         <span className="text-xl">👎</span>
       </button>

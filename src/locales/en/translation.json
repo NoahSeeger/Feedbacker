@@ -56,7 +56,14 @@
     "copied": "Link copied",
     "noFeedback": "No feedback entries yet",
     "waitMessagePrefix": "Please wait",
-    "waitMessageSuffix": "seconds"
+    "waitMessageSuffix": "seconds",
+    "sort": {
+      "label": "Sort by",
+      "newest": "Newest first",
+      "oldest": "Oldest first",
+      "mostVoted": "Most voted",
+      "leastVoted": "Least voted"
+    }
   },
   "settings": {
     "title": "Account Settings",
@@ -101,5 +108,74 @@
     "description": "Sorry, we couldn't find the page you're looking for.",
     "goHome": "Go home",
     "goBack": "Go back"
+  },
+  "account": {
+    "passwordMismatch": "Passwords do not match",
+    "passwordChanged": "Password successfully changed",
+    "passwordError": "Error changing password",
+    "deleteConfirm": "Are you sure you want to delete your account? This action cannot be undone.",
+    "deleteSuccess": "Account successfully deleted",
+    "deleteError": "Error deleting account"
+  },
+  "toast": {
+    "account": {
+      "passwordMismatch": "Passwords do not match",
+      "passwordChanged": "Password successfully changed",
+      "passwordError": "Error changing password",
+      "deleteSuccess": "Account successfully deleted",
+      "deleteError": "Error deleting account"
+    },
+    "feedback": {
+      "created": "Feedback successfully submitted",
+      "createError": "Error submitting feedback",
+      "deleted": "Feedback successfully deleted",
+      "deleteError": "Error deleting feedback",
+      "updated": "Feedback successfully updated",
+      "updateError": "Error updating feedback"
+    },
+    "voting": {
+      "added": "Vote counted",
+      "removed": "Vote removed",
+      "error": "Error voting",
+      "loginRequired": "Please login to vote",
+      "feedbackNotFound": "Feedback entry no longer exists"
+    },
+    "board": {
+      "created": "Board successfully created",
+      "createError": "Error creating board",
+      "deleted": "Board successfully deleted",
+      "deleteError": "Error deleting board",
+      "updated": "Board successfully updated",
+      "updateError": "Error updating board",
+      "linkCopied": "Link copied to clipboard",
+      "copyError": "Error copying link"
+    }
+  },
+  "accountSettings": {
+    "title": "Account Settings",
+    "information": {
+      "title": "Account Information",
+      "email": "Email",
+      "createdAt": "Account created on",
+      "lastLogin": "Last login"
+    },
+    "password": {
+      "title": "Change Password",
+      "changeButton": "Change Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "deleteAccount": {
+      "title": "Delete Account",
+      "button": "Delete Account"
+    }
+  },
+  "feedback": {
+    "emptyError": "Please enter feedback",
+    "inappropriateContent": "Please use appropriate language",
+    "notFound": "Feedback entry not found",
+    "deleteNotAllowed": "You don't have permission to delete this entry"
   }
 }

@@ -6,7 +6,7 @@ import { supabase } from "../config/supabaseClient";
 import DeleteBoardModal from "../components/DeleteBoardModal";
 import FeedbackItem from "../components/FeedbackItem";
 import { containsInappropriateContent } from "../utils/contentChecker";
-import { deleteFeedback } from "../services/feedbackService";
+// import { deleteFeedback } from "../services/feedbackService";
 
 interface FeedbackItem {
   id: string;
@@ -14,6 +14,9 @@ interface FeedbackItem {
   board_id: string;
   created_at: string;
   user_id?: string;
+  session_id?: string;
+  upvotes: number;
+  downvotes: number;
 }
 
 interface BoardDetails {
@@ -22,6 +25,8 @@ interface BoardDetails {
   description: string;
   user_id: string;
 }
+
+type SortOption = "newest" | "oldest" | "mostVoted" | "leastVoted";
 
 export default function FeedbackBoard({ user }: { user: any }) {
   const { t } = useTranslation();
@@ -39,6 +44,7 @@ export default function FeedbackBoard({ user }: { user: any }) {
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
+  const [sortBy, setSortBy] = useState<SortOption>("newest");
 
   const FEEDBACK_COOLDOWN = 30;
 
@@ -68,7 +74,7 @@ export default function FeedbackBoard({ user }: { user: any }) {
 
         if (boardError) throw boardError;
         if (!boardData) {
-          toast.error("Board nicht gefunden");
+          toast.error(t("feedbackBoard.notFound"));
           navigate("/dashboard");
           return;
         }
@@ -76,6 +82,7 @@ export default function FeedbackBoard({ user }: { user: any }) {
         setBoardDetails(boardData);
         setIsOwner(user?.id === boardData.user_id);
 
+        // Hole zuerst die Feedback-Items
         const { data: feedbackData, error: feedbackError } = await supabase
           .from("feedback_items")
           .select("*")
@@ -84,10 +91,33 @@ export default function FeedbackBoard({ user }: { user: any }) {
 
         if (feedbackError) throw feedbackError;
 
-        setFeedbackItems(feedbackData || []);
+        // Hole dann die Vote-Counts für jedes Feedback-Item
+        const feedbackWithVotes = await Promise.all(
+          (feedbackData || []).map(async (feedback) => {
+            const { count: upvotes } = await supabase
+              .from("feedback_votes")
+              .select("*", { count: "exact", head: true })
+              .eq("feedback_id", feedback.id)
+              .eq("vote_type", "up");
+
+            const { count: downvotes } = await supabase
+              .from("feedback_votes")
+              .select("*", { count: "exact", head: true })
+              .eq("feedback_id", feedback.id)
+              .eq("vote_type", "down");
+
+            return {
+              ...feedback,
+              upvotes: upvotes || 0,
+              downvotes: downvotes || 0,
+            };
+          })
+        );
+
+        setFeedbackItems(feedbackWithVotes);
       } catch (err) {
         console.error("Error loading data:", err);
-        toast.error("Fehler beim Laden der Daten");
+        toast.error(t("feedbackBoard.loadError"));
       } finally {
         setIsLoading(false);
       }
@@ -113,12 +143,12 @@ export default function FeedbackBoard({ user }: { user: any }) {
 
     const cleanContent = newFeedback.trim();
     if (!cleanContent) {
-      toast.error("Bitte geben Sie Feedback ein");
+      toast.error(t("feedback.emptyError"));
       return;
     }
 
     if (containsInappropriateContent(cleanContent)) {
-      toast.error("Bitte verwenden Sie eine angemessene Sprache");
+      toast.error(t("feedback.inappropriateContent"));
       return;
     }
 
@@ -141,10 +171,10 @@ export default function FeedbackBoard({ user }: { user: any }) {
       setFeedbackItems([data, ...feedbackItems]);
       setNewFeedback("");
       setLastFeedbackTime(Date.now());
-      toast.success("Feedback wurde hinzugefügt");
+      toast.success(t("toast.feedback.created"));
     } catch (error) {
       console.error("Error adding feedback:", error);
-      toast.error("Fehler beim Hinzufügen des Feedbacks");
+      toast.error(t("toast.feedback.createError"));
     }
   };
 
@@ -185,10 +215,10 @@ export default function FeedbackBoard({ user }: { user: any }) {
       if (boardError) throw boardError;
 
       navigate("/dashboard");
-      toast.success("Board wurde erfolgreich gelöscht");
+      toast.success(t("toast.board.deleted"));
     } catch (err) {
       console.error("Error deleting board:", err);
-      toast.error("Fehler beim Löschen des Boards");
+      toast.error(t("toast.board.deleteError"));
     }
   };
 
@@ -202,9 +232,9 @@ export default function FeedbackBoard({ user }: { user: any }) {
     const url = window.location.href;
     try {
       await navigator.clipboard.writeText(url);
-      toast.success("Link wurde in die Zwischenablage kopiert");
+      toast.success(t("toast.board.linkCopied"));
     } catch (err) {
-      toast.error("Fehler beim Kopieren des Links");
+      toast.error(t("toast.board.copyError"));
     }
   };
 
@@ -232,10 +262,10 @@ export default function FeedbackBoard({ user }: { user: any }) {
           : null
       );
       setIsEditing(false);
-      toast.success("Board wurde aktualisiert");
+      toast.success(t("toast.board.updated"));
     } catch (err) {
       console.error("Error updating board:", err);
-      toast.error("Fehler beim Aktualisieren des Boards");
+      toast.error(t("toast.board.updateError"));
     }
   };
 
@@ -251,38 +281,62 @@ export default function FeedbackBoard({ user }: { user: any }) {
     try {
       if (!feedbackId) return;
 
-      const sessionId = localStorage.getItem("feedback_session_id") || "";
+      // Lösche zuerst die Votes
+      const { error: votesError } = await supabase
+        .from("feedback_votes")
+        .delete()
+        .eq("feedback_id", feedbackId);
 
-      // Optimistisches UI-Update
+      if (votesError) {
+        console.error("Error deleting votes:", votesError);
+        throw votesError;
+      }
+
+      // Dann lösche das Feedback
+      const { error: deleteError } = await supabase
+        .from("feedback_items")
+        .delete()
+        .eq("id", feedbackId);
+
+      if (deleteError) {
+        console.error("Error deleting feedback:", deleteError);
+        throw deleteError;
+      }
+
+      // UI Update
       setFeedbackItems((prevItems) =>
         prevItems.filter((item) => item.id !== feedbackId)
       );
 
-      await deleteFeedback({
-        feedbackId,
-        userId: user?.id,
-        sessionId,
-      });
-
-      toast.success("Feedback wurde gelöscht");
+      toast.success(t("toast.feedback.deleted"));
     } catch (error) {
-      // Bei Fehler den gelöschten Eintrag wiederherstellen
-      const { data } = await supabase
-        .from("feedback_items")
-        .select("*")
-        .eq("id", feedbackId)
-        .single();
+      console.error("Full error object:", error);
+      toast.error(t("toast.feedback.deleteError"));
+    }
+  };
 
-      if (data) {
-        setFeedbackItems((prevItems) => [...prevItems, data]);
-      }
-
-      console.error("Delete error:", error);
-      if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        toast.error("Fehler beim Löschen des Feedbacks");
-      }
+  // Sortier-Funktion
+  const sortFeedbackItems = (items: FeedbackItem[]) => {
+    switch (sortBy) {
+      case "oldest":
+        return [...items].sort(
+          (a, b) =>
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        );
+      case "mostVoted":
+        return [...items].sort(
+          (a, b) => b.upvotes - b.downvotes - (a.upvotes - a.downvotes)
+        );
+      case "leastVoted":
+        return [...items].sort(
+          (a, b) => a.upvotes - a.downvotes - (b.upvotes - b.downvotes)
+        );
+      case "newest":
+      default:
+        return [...items].sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
     }
   };
 
@@ -416,15 +470,37 @@ export default function FeedbackBoard({ user }: { user: any }) {
           </form>
         </div>
 
+        <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
+          <div className="flex items-center justify-end">
+            <label className="text-sm text-gray-600 mr-2">
+              {t("feedbackBoard.sort.label")}:
+            </label>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as SortOption)}
+              className="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="newest">{t("feedbackBoard.sort.newest")}</option>
+              <option value="oldest">{t("feedbackBoard.sort.oldest")}</option>
+              <option value="mostVoted">
+                {t("feedbackBoard.sort.mostVoted")}
+              </option>
+              <option value="leastVoted">
+                {t("feedbackBoard.sort.leastVoted")}
+              </option>
+            </select>
+          </div>
+        </div>
+
         <div className="space-y-4">
           {feedbackItems.length > 0 ? (
-            feedbackItems.map((item) => (
+            sortFeedbackItems(feedbackItems).map((item) => (
               <FeedbackItem
                 key={item.id}
                 feedback={item}
                 userId={user?.id}
                 sessionId={sessionId}
-                isOwner={isOwner || (user?.id && item.user_id === user.id)}
+                isBoardOwner={isOwner}
                 onDelete={() => handleDelete(item.id)}
               />
             ))
