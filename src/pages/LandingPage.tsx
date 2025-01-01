@@ -9,7 +9,21 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Hero Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 flex flex-col items-center gap-6">
+        <a
+          href="https://www.producthunt.com/posts/feedbacker-2?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-feedbacker&#0045;2"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:opacity-90 transition-opacity"
+        >
+          <img
+            src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=749158&theme=light"
+            alt="Feedbacker - Easy feedback collection | Product Hunt"
+            width="250"
+            height="54"
+            style={{ width: "250px", height: "54px" }}
+          />
+        </a>
         <div className="text-center max-w-4xl mx-auto">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight">
             <span className="block text-gray-900">{t("landing.title")}</span>
