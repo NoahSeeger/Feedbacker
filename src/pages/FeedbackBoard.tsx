@@ -5,10 +5,7 @@ import { toast } from "react-hot-toast";
 import { supabase } from "../config/supabaseClient";
 import DeleteBoardModal from "../components/DeleteBoardModal";
 import FeedbackItem from "../components/FeedbackItem";
-import { v4 as uuidv4 } from "uuid";
 import { containsInappropriateContent } from "../utils/contentChecker";
-import { SessionService } from "../services/sessionService";
-import { FeedbackService } from "../services/feedbackService";
 import { deleteFeedback } from "../services/feedbackService";
 
 interface FeedbackItem {
@@ -143,6 +140,7 @@ export default function FeedbackBoard({ user }: { user: any }) {
 
       setFeedbackItems([data, ...feedbackItems]);
       setNewFeedback("");
+      setLastFeedbackTime(Date.now());
       toast.success("Feedback wurde hinzugefügt");
     } catch (error) {
       console.error("Error adding feedback:", error);

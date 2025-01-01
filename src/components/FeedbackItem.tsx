@@ -12,6 +12,7 @@ interface FeedbackItemProps {
   };
   userId?: string;
   sessionId: string;
+  isOwner: boolean;
   onDelete: (feedbackId: string) => void;
 }
 
@@ -19,6 +20,7 @@ export default function FeedbackItem({
   feedback,
   userId,
   sessionId,
+  // isOwner,
   onDelete,
 }: FeedbackItemProps) {
   const [isDeleting, setIsDeleting] = useState(false);
