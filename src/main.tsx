@@ -7,8 +7,8 @@ import "./i18n";
 
 const options = {
   api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
-  loaded: (posthog) => {
-    if (import.meta.env.DEV) posthog.opt_out_capturing();
+  loaded: (posthogInstance: any) => {
+    if (import.meta.env.DEV) posthogInstance.opt_out_capturing();
   },
 };
 
