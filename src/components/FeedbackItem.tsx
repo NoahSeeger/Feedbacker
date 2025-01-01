@@ -48,10 +48,12 @@ export default function FeedbackItem({
     : feedback.content;
 
   return (
-    <div className="bg-white rounded-lg shadow p-4">
-      <div className="flex items-center justify-between">
-        <p className="text-gray-800">{displayContent}</p>
-        <div className="flex items-center space-x-4">
+    <div className="bg-white rounded-lg shadow p-3 sm:p-4">
+      <div className="flex flex-col sm:flex-row justify-between gap-2 sm:gap-4">
+        <div className="flex-1">
+          <p className="text-sm sm:text-base">{displayContent}</p>
+        </div>
+        <div className="flex flex-row sm:flex-col items-center gap-2">
           <VoteButtons
             feedbackId={feedback.id}
             userId={userId}

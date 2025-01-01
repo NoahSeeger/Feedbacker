@@ -13,6 +13,7 @@ import FeedbackBoard from "./pages/FeedbackBoard";
 import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
 import { Toaster } from "react-hot-toast";
+import AccountSettings from "./pages/AccountSettings";
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -45,6 +46,12 @@ function App() {
           <Route
             path="/board/:boardId"
             element={<FeedbackBoard user={user} />}
+          />
+          <Route
+            path="/settings"
+            element={
+              user ? <AccountSettings user={user} /> : <Navigate to="/" />
+            }
           />
           <Route path="*" element={<NotFound />} />
         </Routes>

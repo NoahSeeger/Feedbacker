@@ -78,8 +78,8 @@ export default function Dashboard({ user }: { user: any }) {
       </div>
 
       {isCreating && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg w-full max-w-md">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white p-4 sm:p-6 rounded-lg w-full max-w-md mx-4">
             <h2 className="text-xl font-bold mb-4">
               Neues Feedback Board erstellen
             </h2>
@@ -125,7 +125,7 @@ export default function Dashboard({ user }: { user: any }) {
       {/* Eigene Boards Sektion */}
       <div className="mb-12">
         <h2 className="text-2xl font-bold mb-6">Meine Feedback Boards</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {ownBoards.map((board) => (
             <Link
               key={board.id}
@@ -149,7 +149,7 @@ export default function Dashboard({ user }: { user: any }) {
       {/* Andere Boards Sektion */}
       <div>
         <h2 className="text-2xl font-bold mb-6">Alle Feedback Boards</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {otherBoards.map((board) => (
             <Link
               key={board.id}
