@@ -1,22 +1,15 @@
-import { useState, useEffect } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { supabase } from "./config/supabaseClient";
-import { User } from "@supabase/supabase-js";
+import Navbar from "./components/Navbar";
 import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
 import FeedbackBoard from "./pages/FeedbackBoard";
-import NotFound from "./pages/NotFound";
-import Navbar from "./components/Navbar";
-import { Toaster } from "react-hot-toast";
 import AccountSettings from "./pages/AccountSettings";
+import NotFound from "./pages/NotFound";
 
 function App() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -33,30 +26,24 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <Toaster position="top-right" />
-      <div className="min-h-screen bg-gray-100">
+    <BrowserRouter>
+      <div className="min-h-screen bg-gray-50">
         <Navbar user={user} />
         <Routes>
           <Route path="/" element={<LandingPage user={user} />} />
-          <Route
-            path="/dashboard"
-            element={user ? <Dashboard user={user} /> : <Navigate to="/" />}
-          />
+          <Route path="/dashboard" element={<Dashboard user={user} />} />
           <Route
             path="/board/:boardId"
             element={<FeedbackBoard user={user} />}
           />
-          <Route
-            path="/settings"
-            element={
-              user ? <AccountSettings user={user} /> : <Navigate to="/" />
-            }
-          />
+          {/* Settings nur für eingeloggte User */}
+          {user && (
+            <Route path="/settings" element={<AccountSettings user={user} />} />
+          )}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
-    </Router>
+    </BrowserRouter>
   );
 }
 

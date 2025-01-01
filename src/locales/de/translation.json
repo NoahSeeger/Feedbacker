@@ -26,7 +26,8 @@
         "title": "Community Voting",
         "description": "Lass die Gemeinschaft die besten Ideen durch Up- und Down-Voting finden."
       }
-    }
+    },
+    "viewBoards": "Alle Boards ansehen"
   },
   "dashboard": {
     "title": "Feedback Boards",
@@ -40,7 +41,9 @@
       "descriptionLabel": "Beschreibung des Boards",
       "create": "Erstellen",
       "cancel": "Abbrechen"
-    }
+    },
+    "loginToCreate": "Melde dich an, um ein Board zu erstellen",
+    "viewBoards": "Boards ansehen"
   },
   "feedbackBoard": {
     "yourFeedback": "Dein Feedback",

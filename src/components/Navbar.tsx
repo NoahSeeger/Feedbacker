@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
-import { supabase } from "../config/supabaseClient";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { supabase } from "../config/supabaseClient";
+import AuthModal from "./AuthModal";
 
 interface NavbarProps {
   user: any;
@@ -8,6 +10,7 @@ interface NavbarProps {
 
 export default function Navbar({ user }: NavbarProps) {
   const { t, i18n } = useTranslation();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -32,14 +35,14 @@ export default function Navbar({ user }: NavbarProps) {
               </Link>
             </div>
             <div className="flex items-center gap-6">
+              <Link
+                to="/dashboard"
+                className="text-gray-600 hover:text-blue-600"
+              >
+                {t("nav.boards")}
+              </Link>
               {user ? (
                 <>
-                  <Link
-                    to="/dashboard"
-                    className="text-gray-600 hover:text-blue-600"
-                  >
-                    {t("nav.boards")}
-                  </Link>
                   <Link
                     to="/settings"
                     className="text-gray-600 hover:text-blue-600"
@@ -54,14 +57,13 @@ export default function Navbar({ user }: NavbarProps) {
                   </button>
                 </>
               ) : (
-                <Link
-                  to="/"
+                <button
+                  onClick={() => setIsAuthModalOpen(true)}
                   className="text-blue-600 hover:text-blue-800 font-medium"
                 >
                   {t("nav.login")}
-                </Link>
+                </button>
               )}
-              {/* Sprach-Toggle Button */}
               <button
                 onClick={toggleLanguage}
                 className="px-3 py-1 text-sm bg-gray-100 rounded-md hover:bg-gray-200"
@@ -129,6 +131,12 @@ export default function Navbar({ user }: NavbarProps) {
 
       {/* Spacer für Mobile Navigation */}
       <div className="h-16 sm:hidden" />
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+      />
     </>
   );
 }

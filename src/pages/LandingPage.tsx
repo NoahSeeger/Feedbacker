@@ -1,22 +1,10 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Features from "../components/Features";
-import AuthModal from "../components/AuthModal";
-import { supabase } from "../config/supabaseClient";
 
 export default function LandingPage({ user }: { user: any }) {
   const navigate = useNavigate();
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const { t } = useTranslation();
-
-  const handleGetStarted = () => {
-    if (user) {
-      navigate("/dashboard");
-    } else {
-      setIsAuthModalOpen(true);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -32,21 +20,13 @@ export default function LandingPage({ user }: { user: any }) {
           <p className="mt-6 text-lg sm:text-xl text-gray-600">
             {t("landing.description")}
           </p>
-          <div className="mt-8 flex justify-center space-x-4">
+          <div className="mt-8">
             <button
-              onClick={handleGetStarted}
+              onClick={() => navigate("/dashboard")}
               className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
             >
-              {user ? t("landing.dashboard") : t("landing.getStarted")}
+              {t("landing.viewBoards")}
             </button>
-            {user && (
-              <button
-                onClick={() => supabase.auth.signOut()}
-                className="inline-flex items-center justify-center px-8 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-              >
-                {t("nav.logout")}
-              </button>
-            )}
           </div>
         </div>
       </div>
@@ -57,12 +37,6 @@ export default function LandingPage({ user }: { user: any }) {
           <Features />
         </div>
       </div>
-
-      {/* Auth Modal */}
-      <AuthModal
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
-      />
     </div>
   );
 }

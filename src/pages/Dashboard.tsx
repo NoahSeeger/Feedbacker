@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "../config/supabaseClient";
+import { toast } from "react-hot-toast";
 import { containsInappropriateContent } from "../utils/contentChecker";
+import AuthModal from "../components/AuthModal";
 
 interface FeedbackBoard {
   id: string;
@@ -18,6 +20,7 @@ export default function Dashboard({ user }: { user: any }) {
   const [newBoard, setNewBoard] = useState({ title: "", description: "" });
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState("");
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   useEffect(() => {
     fetchBoards();
@@ -35,13 +38,18 @@ export default function Dashboard({ user }: { user: any }) {
 
   async function createBoard(e: React.FormEvent) {
     e.preventDefault();
+    if (!user) {
+      toast.error(t("auth.loginRequired"));
+      return;
+    }
+
     setError("");
 
     if (
       containsInappropriateContent(newBoard.title) ||
       containsInappropriateContent(newBoard.description)
     ) {
-      setError("Bitte verwende eine angemessene Sprache.");
+      setError(t("common.inappropriateContent"));
       return;
     }
 
@@ -64,22 +72,39 @@ export default function Dashboard({ user }: { user: any }) {
   }
 
   // Trennen der Boards in eigene und andere
-  const ownBoards = boards.filter((board) => board.user_id === user.id);
-  const otherBoards = boards.filter((board) => board.user_id !== user.id);
+  const ownBoards = user
+    ? boards.filter((board) => board.user_id === user.id)
+    : [];
+  const otherBoards = user
+    ? boards.filter((board) => board.user_id !== user.id)
+    : boards;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold">{t("dashboard.title")}</h1>
-        <button
-          onClick={() => setIsCreating(true)}
-          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-        >
-          {t("dashboard.createBoard")}
-        </button>
+        {user ? (
+          <button
+            onClick={() => setIsCreating(true)}
+            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+          >
+            {t("dashboard.createBoard")}
+          </button>
+        ) : (
+          <div className="flex items-center gap-2 text-gray-600 bg-blue-50 px-4 py-2 rounded-md">
+            <span>{t("dashboard.loginToCreate")}</span>
+            <button
+              onClick={() => setIsAuthModalOpen(true)}
+              className="text-blue-600 hover:text-blue-800 font-medium"
+            >
+              {t("nav.login")}
+            </button>
+          </div>
+        )}
       </div>
 
-      {isCreating && (
+      {/* Create Board Modal - nur für eingeloggte User */}
+      {isCreating && user && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
           <div className="bg-white p-4 sm:p-6 rounded-lg w-full max-w-md mx-4">
             <h2 className="text-xl font-bold mb-4">
@@ -124,29 +149,33 @@ export default function Dashboard({ user }: { user: any }) {
         </div>
       )}
 
-      <div className="mb-12">
-        <h2 className="text-2xl font-bold mb-6">{t("dashboard.myBoards")}</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {ownBoards.map((board) => (
-            <Link
-              key={board.id}
-              to={`/board/${board.id}`}
-              className="block bg-white rounded-lg shadow hover:shadow-md transition-shadow"
-            >
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2">{board.title}</h3>
-                <p className="text-gray-600">{board.description}</p>
-                <div className="mt-4">
-                  <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
-                    {t("dashboard.owner")}
-                  </span>
+      {/* Eigene Boards Sektion - nur für eingeloggte User */}
+      {user && ownBoards.length > 0 && (
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold mb-6">{t("dashboard.myBoards")}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {ownBoards.map((board) => (
+              <Link
+                key={board.id}
+                to={`/board/${board.id}`}
+                className="block bg-white rounded-lg shadow hover:shadow-md transition-shadow"
+              >
+                <div className="p-6">
+                  <h3 className="text-xl font-semibold mb-2">{board.title}</h3>
+                  <p className="text-gray-600">{board.description}</p>
+                  <div className="mt-4">
+                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
+                      {t("dashboard.owner")}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
+      {/* Alle Boards Sektion */}
       <div>
         <h2 className="text-2xl font-bold mb-6">{t("dashboard.allBoards")}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -164,6 +193,11 @@ export default function Dashboard({ user }: { user: any }) {
           ))}
         </div>
       </div>
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+      />
     </div>
   );
 }
