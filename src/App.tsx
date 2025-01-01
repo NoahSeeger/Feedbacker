@@ -30,7 +30,7 @@ function App() {
       <div className="min-h-screen bg-gray-50">
         <Navbar user={user} />
         <Routes>
-          <Route path="/" element={<LandingPage user={user} />} />
+          <Route path="/" element={<LandingPage />} />
           <Route path="/dashboard" element={<Dashboard user={user} />} />
           <Route
             path="/board/:boardId"
